@@ -6,9 +6,12 @@ param (
     [string]$Token
 )
 
-$secureToken=$Token | ConvertTo-SecureString -AsPlainText -Force
+$Header = @{
+    "authorization" = "Bearer $Token"
+}
+
 #Get all releases
-$getReleases = Invoke-RestMethod -Method Get -Authentication Bearer -Token $secureToken -URI  "https://api.github.com/repos/StefanIvemo/ActionsTest/releases"
+$getReleases = Invoke-RestMethod -Method Get -Headers $Header -URI  "https://api.github.com/repos/StefanIvemo/ActionsTest/releases"
 
 #Check if a release draft exists
 foreach ($release in $getReleases){
