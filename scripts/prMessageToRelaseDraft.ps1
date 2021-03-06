@@ -2,7 +2,7 @@
 param (
     [Parameter()]
     [string]$PRTitle,
-    [int]$PRNumber,
+    [string]$PRNumber,
     [securestring]$Token
 )
 
