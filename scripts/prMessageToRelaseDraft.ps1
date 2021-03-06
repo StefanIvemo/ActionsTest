@@ -3,7 +3,7 @@ param (
     [Parameter()]
     [string]$PRTitle,
     [string]$PRNumber,
-    [securestring]$Token
+    [string]$Token
 )
 
 #Get all releases
