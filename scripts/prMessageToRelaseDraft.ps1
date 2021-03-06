@@ -7,7 +7,7 @@ param (
 )
 
 $Header = @{
-    "authorization" = "Bearer $Token"
+    "authorization" = "token $Token"
 }
 
 #Get all releases
