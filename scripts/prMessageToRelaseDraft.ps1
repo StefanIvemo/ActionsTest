@@ -20,9 +20,9 @@ foreach ($release in $getReleases){
 
 #Add merged PR to release notes draft
 if (-not [string]::IsNullOrWhiteSpace($draftBody)) {
-    $draftBody += "$PRMessage (#$PRNumber)"
+    $draftBody += "$PRTitle (#$PRNumber)"
 } else {
-    $draftBody = "$PRMessage (#$PRNumber)"
+    $draftBody = "$PRTitle (#$PRNumber)"
 }
 
 #Create new draft
