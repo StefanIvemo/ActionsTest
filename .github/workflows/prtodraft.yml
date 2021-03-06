@@ -17,6 +17,7 @@ jobs:
     runs-on: windows-latest
 
     steps:
+    - uses: actions/checkout@v2
     - name: Create/Update release draft  
       shell: pwsh
       run: ./scripts/prMessageToRelaseDraft.ps1 -PRNumber env.PR_NUMBER -PRTitle env.PR_TITLE -Token env.GITHUB_TOKEN
