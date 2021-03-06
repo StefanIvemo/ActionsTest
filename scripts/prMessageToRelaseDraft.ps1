@@ -32,4 +32,4 @@ $Body = @{
     body        = $draftBody
     draft       = true
 }
-$createReleaseDraft = Invoke-RestMethod -Method Post -Body $Body -URI  "https://api.github.com/repos/StefanIvemo/BicepPowerShell/releases" 
+$createReleaseDraft = Invoke-RestMethod -Method Post -Authentication Bearer -Token $Token -Body $Body -URI  "https://api.github.com/repos/StefanIvemo/BicepPowerShell/releases" 
