@@ -3,7 +3,7 @@
 env:
   PR_NUMBER: ${{ github.event.number }}
   PR_TITLE: ${{ github.event.pull_request.title }}
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.RELEASE_SECRET }}
 
 name: Add_PR_to_ReleaseDraft
 
