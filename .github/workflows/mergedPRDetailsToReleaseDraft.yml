@@ -1,5 +1,4 @@
-# This is a basic workflow to help you get started with Actions
-
+# This workflow adds info about each merged PR to release draft
 env:
   PR_NUMBER: ${{ github.event.number }}
   PR_TITLE: ${{ github.event.pull_request.title }}
@@ -7,9 +6,9 @@ env:
 
 name: Add_PR_to_ReleaseDraft
 
-
-# Controls when the action will run. 
-on: [pull_request]
+on:
+  push:
+    branches: [ main ]
   
 jobs:
   build:

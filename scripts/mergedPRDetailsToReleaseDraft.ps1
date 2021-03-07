@@ -23,7 +23,7 @@ foreach ($release in $getReleases) {
     }
 }
 
-#Add merged PR to release notes draft
+#Add merged PR details to release notes draft
 if (-not [string]::IsNullOrWhiteSpace($releaseBody)) {
     $releaseBody += "`n- $PRTitle (#$PRNumber)"
 }
