@@ -1,8 +1,9 @@
 # This workflow adds info about each merged PR to release draft
 env:
   PR_NUMBER: ${{ github.event.number }}
-  PR_TITLE: ${{ github.event.pull_request.title }}
+  PR_TITLE: ${{ github.event.head_commit.message }}
   GITHUB_TOKEN: ${{ secrets.RELEASE_SECRET }}
+  GITHUB_EVENT_NAME: ${{ GITHUB_EVENT_NAME }}
 
 name: Add_PR_to_ReleaseDraft
 
