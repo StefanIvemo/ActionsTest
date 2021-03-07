@@ -8,6 +8,7 @@ param (
 
 $Header = @{
     "authorization" = "token $Token"
+    "Accept" = "application/vnd.github.v3+json"
 }
 
 #Get all releases
@@ -15,7 +16,7 @@ $getReleases = Invoke-RestMethod -Method Get -Headers $Header -URI  "https://api
 
 #Check if a release draft exists
 foreach ($release in $getReleases){
-    if ($release.draft -and ($release.name -eq "WIP - Next Release")) {
+    if ($release.draft -and ($release.tag_name -eq "vNext")) {
         Write-Host "Found a draft with id $($release.id)"
         $draftID=$release.id
         $draftBody=$release.body
@@ -29,11 +30,14 @@ if (-not [string]::IsNullOrWhiteSpace($draftBody)) {
     $draftBody = "$PRTitle (#$PRNumber)"
 }
 
+
+
 #Create new draft
 $Body = @{
-    tag_name    = "WIP - Next Release"
+    tag_name    = "vNext"
     name        = "WIP - Next Release"
     body        = $draftBody
-    draft       = true
+    draft       = $true
 }
-$createReleaseDraft = Invoke-RestMethod -Method Post -Authentication Bearer -Token $Token -Body $Body -URI  "https://api.github.com/repos/StefanIvemo/BicepPowerShell/releases" 
+$requestBody=ConvertTo-Json $Body
+$createReleaseDraft = Invoke-RestMethod -Method Post -Headers $Header -Body $requestBody -URI  "https://api.github.com/repos/StefanIvemo/ActionsTest/releases" -Verbose
