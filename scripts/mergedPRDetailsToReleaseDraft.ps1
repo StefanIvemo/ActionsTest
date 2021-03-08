@@ -29,8 +29,10 @@ $releaseMessage = $Rest
 
 #Get PR details from commit
 $prNumber = ($PR -split "#")[1]
+$prNumber="11"
 $getPullRequest = Invoke-RestMethod -Method Get -URI  "https://api.github.com/repos/StefanIvemo/ActionsTest/pulls/$prNumber"
 $prLabel = $getPullRequest.labels.name
+Write-Host "Found PR #$($getPullRequest.number) with label $prLabel by ($getPullRequest.user.login)"
 
 #Commit details
 $mergedCommit = @{
@@ -39,6 +41,8 @@ $mergedCommit = @{
     commitAuthor  = $getPullRequest.user.login
     mergedDate    = $getPullRequest.merged_at
 }
+Write-Host "Building commit object"
+Write-Host $mergedCommit
 
 #Only process PRs with labels assigned
 if ($prLabel -eq 'bugFix' -or $prLabel -eq 'newFeature' -or $prLabel -eq 'updatedDocs') {
@@ -52,7 +56,7 @@ if ($prLabel -eq 'bugFix' -or $prLabel -eq 'newFeature' -or $prLabel -eq 'update
             bugFix      = @()
             updatedDocs = @()  
         }
-        $releaseBody[$prLabel] += $newRelease   
+        $releaseBody[$prLabel] += $mergedCommit   
     }
     $releaseBody = $releaseBody | ConvertTo-Json
     
