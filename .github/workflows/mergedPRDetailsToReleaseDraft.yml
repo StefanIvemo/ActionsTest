@@ -1,9 +1,6 @@
 # This workflow adds info about each merged PR to release draft
 env:
-  PUSH_ID: ${{ github.event.push_id }}
   COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
-  COMMIT_AUTHOR: ${{ github.event.head_commit.author.name }}
-  COMMIT_SHA: ${{ github.event.head_commit.sha }}
   GITHUB_TOKEN: ${{ secrets.RELEASE_SECRET }}
 
 name: Add_PR_to_ReleaseDraft
@@ -21,4 +18,4 @@ jobs:
     - uses: actions/checkout@v2
     - name: Create/Update release draft  
       shell: pwsh
-      run: ./scripts/mergedPRDetailsToReleaseDraft -PRNumber "$env:PUSH_ID" -PRTitle "$env:COMMIT_MESSAGE" -Token "$env:GITHUB_TOKEN" "$env:COMMIT_AUTHOR"  "$env:COMMIT_SHA"
+      run: ./scripts/mergedPRDetailsToReleaseDraft -CommitMessage "$env:COMMIT_MESSAGE" -Token "$env:GITHUB_TOKEN"
