@@ -26,6 +26,7 @@ foreach ($release in $getReleases) {
 $FirstLine,$Rest = $CommitMessage -split [System.Environment]::NewLine,2 | Foreach-Object -MemberName Trim
 $PR = $FirstLine -replace '.*(#\d+).*', '$1'
 $releaseMessage ='{0} ({1})' -f $Rest, $PR
+Write-Host $releaseMessage
 
 #Add merged PR details to release notes draft
 if (-not [string]::IsNullOrWhiteSpace($releaseBody)) {
@@ -34,6 +35,7 @@ if (-not [string]::IsNullOrWhiteSpace($releaseBody)) {
 else {
     $releaseBody = "- $releaseMessage"
 }
+Write-Host $releaseBody
 
 #Create new draft body
 $body = @{
@@ -43,6 +45,7 @@ $body = @{
     draft    = $true
 }
 $requestBody = ConvertTo-Json $body
+Write-Host $requestBody
 
 if (!$releaseId) {
     $createRelease = Invoke-RestMethod -Method Post -Headers $Header -Body $requestBody -URI  "https://api.github.com/repos/StefanIvemo/ActionsTest/releases" -Verbose
