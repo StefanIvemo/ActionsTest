@@ -22,15 +22,17 @@ foreach ($release in $getReleases) {
     }
 }
 
-$prNumber= $CommitMessage -split "\s+"[3]
-$prMessage= $CommitMessage -split '`r`n'[2]
+#Parse commit message
+$FirstLine,$Rest = $CommitMessage -split [System.Environment]::NewLine,2 | Foreach-Object -MemberName Trim
+$PR = $FirstLine -replace '.*(#\d+).*', '$1'
+$releaseMessage ='{0} ({1})' -f $Rest, $PR
 
 #Add merged PR details to release notes draft
 if (-not [string]::IsNullOrWhiteSpace($releaseBody)) {
-    $releaseBody += "`n- $prMessage (#$prNumber)"
+    $releaseBody += "`n- $releaseMessage"
 }
 else {
-    $releaseBody = "- $prMessage (#$prNumber)"
+    $releaseBody = "- $releaseMessage"
 }
 
 #Create new draft body
