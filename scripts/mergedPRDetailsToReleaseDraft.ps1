@@ -23,7 +23,7 @@ foreach ($release in $getReleases) {
 }
 
 $prNumber= $CommitMessage -split "\s+"[3]
-$prMessage= $CommitMessage -split '\r?\n'[2]
+$prMessage= $CommitMessage -split '`r`n'[2]
 
 #Add merged PR details to release notes draft
 if (-not [string]::IsNullOrWhiteSpace($releaseBody)) {
