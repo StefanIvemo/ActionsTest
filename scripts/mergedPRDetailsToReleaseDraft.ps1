@@ -48,6 +48,7 @@ if ($prLabel -eq 'bugFix' -or $prLabel -eq 'newFeature' -or $prLabel -eq 'update
     if (-not [string]::IsNullOrWhiteSpace($releaseBody)) {
         Write-Host "Found release body from draft"
         $releaseBody = ConvertFrom-Json -AsHashtable -Depth 10
+        Write-Host $releaseBody
         $releaseBody[$prLabel] += $mergedCommit
     }
     else {
@@ -58,7 +59,8 @@ if ($prLabel -eq 'bugFix' -or $prLabel -eq 'newFeature' -or $prLabel -eq 'update
         }
         $releaseBody[$prLabel] += $mergedCommit   
     }
-    $releaseBody = $releaseBody | ConvertTo-Json
+    Write-Host "Converting releasebody to json"
+    $releaseBody = $releaseBody | ConvertTo-Json -Depth 10
     Write-Host "releaseBody:"
     Write-Host $releaseBody
     
@@ -69,7 +71,7 @@ if ($prLabel -eq 'bugFix' -or $prLabel -eq 'newFeature' -or $prLabel -eq 'update
         body     = $releaseBody
         draft    = $true
     }
-    $requestBody = ConvertTo-Json $body
+    $requestBody = ConvertTo-Json $body -Depth 10
     Write-Host $requestBody
     
     if (!$releaseId) {
