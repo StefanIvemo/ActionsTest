@@ -2,8 +2,6 @@
 param (
     [Parameter()]
     [string]$CommitMessage,
-    [string]$CommitAuthor,
-    [string]$CommitLabels,
     [string]$Token
 )
 
@@ -12,7 +10,7 @@ $header = @{
     "Accept"        = "application/vnd.github.v3+json"
 }
 
-#Get all releases
+#Get all releases including drafts
 $getReleases = Invoke-RestMethod -Method Get -Headers $header -URI  "https://api.github.com/repos/StefanIvemo/ActionsTest/releases"
 
 #Check if a release draft exists
@@ -25,50 +23,53 @@ foreach ($release in $getReleases) {
 }
 
 #Parse commit message
-$FirstLine,$Rest = $CommitMessage -split '\n',2 | Foreach-Object -MemberName Trim
+$FirstLine, $Rest = $CommitMessage -split '\n', 2 | Foreach-Object -MemberName Trim
 $PR = $FirstLine -replace '.*(#\d+).*', '$1'
-$releaseMessage ='{0} ({1})' -f $Rest, $PR
+$releaseMessage = $Rest
+
+#Get PR details from commit
+$prNumber = ($PR -split "#")[1]
+$getPullRequest = Invoke-RestMethod -Method Get -URI  "https://api.github.com/repos/StefanIvemo/ActionsTest/pulls/$prNumber"
+$prLabel = $getPullRequest.labels.name
 
 #Commit details
 $mergedCommit = @{
     prNumber      = $prNumber
     commitMessage = $releaseMessage
-    commitAuthor  = $CommitAuthor
-    mergedDate    = (Get-Date -Format "yyyy-MM-dd")
+    commitAuthor  = $getPullRequest.user.login
+    mergedDate    = $getPullRequest.merged_at
 }
 
-if (!$commitType) {
-    $commitType = "Untagged"
-} 
-
-if (-not [string]::IsNullOrWhiteSpace($releaseBody)) {
-    $releaseBody=ConvertFrom-Json -AsHashtable
-    $releaseBody[$commitType] += $mergedCommit
-}
-else {
-    $releaseBody = @{
-        Features = @()
-        Fixes    = @()
-        Docs     = @()
-        Untagged = @()    
+#Only process PRs with labels assigned
+if ($prLabel -eq 'bugFix' -or $prLabel -eq 'newFeature' -or $prLabel -eq 'updatedDocs') {
+    if (-not [string]::IsNullOrWhiteSpace($releaseBody)) {
+        $releaseBody = ConvertFrom-Json -AsHashtable
+        $releaseBody[$prLabel] += $mergedCommit
     }
-    $releaseBody[$commitType] += $newRelease   
-}
-$releaseBody = $releaseBody | ConvertTo-Json
-
-#Create new draft body
-$body = @{
-    tag_name = "vNext"
-    name     = "WIP - Next Release"
-    body     = $releaseBody
-    draft    = $true
-}
-$requestBody = ConvertTo-Json $body
-Write-Host $requestBody
-
-if (!$releaseId) {
-    $createRelease = Invoke-RestMethod -Method Post -Headers $Header -Body $requestBody -URI  "https://api.github.com/repos/StefanIvemo/ActionsTest/releases" -Verbose
-}
-else {
-    $updateRelease = Invoke-RestMethod -Method Patch -Headers $Header -Body $requestBody -URI  "https://api.github.com/repos/StefanIvemo/ActionsTest/releases/$releaseId" -Verbose
-}
+    else {
+        $releaseBody = @{
+            newFeature  = @()
+            bugFix      = @()
+            updatedDocs = @()  
+        }
+        $releaseBody[$prLabel] += $newRelease   
+    }
+    $releaseBody = $releaseBody | ConvertTo-Json
+    
+    #Create new draft body
+    $body = @{
+        tag_name = "vNext"
+        name     = "WIP - Next Release"
+        body     = $releaseBody
+        draft    = $true
+    }
+    $requestBody = ConvertTo-Json $body
+    Write-Host $requestBody
+    
+    if (!$releaseId) {
+        $createRelease = Invoke-RestMethod -Method Post -Headers $Header -Body $requestBody -URI  "https://api.github.com/repos/StefanIvemo/ActionsTest/releases" -Verbose
+    }
+    else {
+        $updateRelease = Invoke-RestMethod -Method Patch -Headers $Header -Body $requestBody -URI  "https://api.github.com/repos/StefanIvemo/ActionsTest/releases/$releaseId" -Verbose
+    }
+} 
