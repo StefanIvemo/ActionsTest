@@ -46,7 +46,8 @@ Write-Host $mergedCommit
 #Only process PRs with labels assigned
 if ($prLabel -eq 'bugFix' -or $prLabel -eq 'newFeature' -or $prLabel -eq 'updatedDocs') {
     if (-not [string]::IsNullOrWhiteSpace($releaseBody)) {
-        $releaseBody = ConvertFrom-Json -AsHashtable
+        Write-Host "Found release body from draft"
+        $releaseBody = ConvertFrom-Json -AsHashtable -Depth 10
         $releaseBody[$prLabel] += $mergedCommit
     }
     else {
@@ -58,6 +59,8 @@ if ($prLabel -eq 'bugFix' -or $prLabel -eq 'newFeature' -or $prLabel -eq 'update
         $releaseBody[$prLabel] += $mergedCommit   
     }
     $releaseBody = $releaseBody | ConvertTo-Json
+    Write-Host "releaseBody:"
+    Write-Host $releaseBody
     
     #Create new draft body
     $body = @{
