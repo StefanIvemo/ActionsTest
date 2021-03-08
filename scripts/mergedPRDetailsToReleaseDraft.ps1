@@ -47,7 +47,7 @@ Write-Host $mergedCommit
 if ($prLabel -eq 'bugFix' -or $prLabel -eq 'newFeature' -or $prLabel -eq 'updatedDocs') {
     if (-not [string]::IsNullOrWhiteSpace($releaseBody)) {
         Write-Host "Found release body from draft"
-        $releaseBody = ConvertFrom-Json -AsHashtable -Depth 10
+        $releaseBody = $releaseBody | ConvertFrom-Json -AsHashtable -Depth 10
         Write-Host $releaseBody
         $releaseBody[$prLabel] += $mergedCommit
     }
