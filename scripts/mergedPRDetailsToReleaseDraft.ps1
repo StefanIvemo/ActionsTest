@@ -2,6 +2,8 @@
 param (
     [Parameter()]
     [string]$CommitMessage,
+    [string]$CommitAuthor,
+    [string]$CommitLabels,
     [string]$Token
 )
 
@@ -26,16 +28,33 @@ foreach ($release in $getReleases) {
 $FirstLine,$Rest = $CommitMessage -split '\n',2 | Foreach-Object -MemberName Trim
 $PR = $FirstLine -replace '.*(#\d+).*', '$1'
 $releaseMessage ='{0} ({1})' -f $Rest, $PR
-Write-Host $releaseMessage
 
-#Add merged PR details to release notes draft
+#Commit details
+$mergedCommit = @{
+    prNumber      = $prNumber
+    commitMessage = $releaseMessage
+    commitAuthor  = $CommitAuthor
+    mergedDate    = (Get-Date -Format "yyyy-MM-dd")
+}
+
+if (!$commitType) {
+    $commitType = "Untagged"
+} 
+
 if (-not [string]::IsNullOrWhiteSpace($releaseBody)) {
-    $releaseBody += "`n- $releaseMessage"
+    $releaseBody=ConvertFrom-Json -AsHashtable
+    $releaseBody[$commitType] += $mergedCommit
 }
 else {
-    $releaseBody = "- $releaseMessage"
+    $releaseBody = @{
+        Features = @()
+        Fixes    = @()
+        Docs     = @()
+        Untagged = @()    
+    }
+    $releaseBody[$commitType] += $newRelease   
 }
-Write-Host $releaseBody
+$releaseBody = $releaseBody | ConvertTo-Json
 
 #Create new draft body
 $body = @{
