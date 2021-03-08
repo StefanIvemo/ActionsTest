@@ -22,8 +22,12 @@ foreach ($release in $getReleases) {
     }
 }
 
+$CommitMessage='Merge pull request #19 from StefanIvemo/testare10
+  
+Added a third smiley :)'
+
 #Parse commit message
-$FirstLine,$Rest = $CommitMessage -split [System.Environment]::NewLine,2 | Foreach-Object -MemberName Trim
+$FirstLine,$Rest = $CommitMessage -split '\n',2 | Foreach-Object -MemberName Trim
 $PR = $FirstLine -replace '.*(#\d+).*', '$1'
 $releaseMessage ='{0} ({1})' -f $Rest, $PR
 Write-Host $releaseMessage
